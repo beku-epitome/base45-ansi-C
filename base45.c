@@ -46,8 +46,9 @@ static unsigned char _C2I[256] = {
 int base45_encode(char * dst, size_t *_max_dst_len, const unsigned char * src, size_t src_len) {
   size_t out_len = 0, max_dst_len;
   max_dst_len = _max_dst_len ? *_max_dst_len : src_len * 4;
+  int i;
 
-  for(unsigned i = 0; i < src_len; i+=2) {
+  for (i = 0; i < src_len; i+=2) {
      if (src_len - i > 1) {
         int x = ((src[i])<<8) + src[i+1];
 
@@ -91,6 +92,7 @@ int base45_encode(char * dst, size_t *_max_dst_len, const unsigned char * src, s
 int base45_decode(unsigned char * dst, size_t * _max_dst_len, const char *src, size_t src_len) {
   size_t out_len = 0, max_dst_len;
   max_dst_len = _max_dst_len  ? *_max_dst_len : src_len;
+  int i;
 
   if (dst == NULL && _max_dst_len == NULL)
 	return -2;
@@ -101,11 +103,11 @@ int base45_decode(unsigned char * dst, size_t * _max_dst_len, const char *src, s
   if (src_len == 0)
 	src_len = strlen(src);
 
-  for(unsigned i = 0; i < src_len; i+=3) {
+  for(i = 0; i < src_len; i+=3) {
      int x,a,b;
 
-     if (src_len - i < 2) 
-	    return -1;
+     if (src_len - i < 2)
+	return -1;
 
      if ((255 == (a = _C2I[(unsigned char)src[i]])) || (255 == (b = _C2I[(unsigned char)src[i+1]])))
 	return -1;
@@ -170,7 +172,8 @@ int main(int argc, char ** argv) {
 	};
 
 #ifdef VALIDATE
-	for(int i = 0; i < 45; i++) assert(i ==  _C2I[BASE45_CHARSET[i]]); 
+	int i;
+	for(i = 0; i < 45; i++) assert(i ==  _C2I[BASE45_CHARSET[i]]);
 #endif
 
         while(!feof(in)) {
@@ -183,7 +186,7 @@ int main(int argc, char ** argv) {
 
 		if (len) {
 			int e;
-			if (decode) 
+			if (decode)
 				e = base45_decode(outbuf, &olen, (char *) buff, len);
 			else
 				e = base45_encode((char *)outbuf, &olen, buff, len);
@@ -197,6 +200,8 @@ int main(int argc, char ** argv) {
 				fwrite(outbuf, 1, olen, out);
 		};
 	}
+
+	fclose(in);
 	fclose(out);
 
 	return(0);
