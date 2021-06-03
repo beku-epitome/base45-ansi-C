@@ -25,14 +25,14 @@ static unsigned char _C2I[256] = {
 	255,255,255,255, 255,255,255,255, 255,255,255,255, 255,255,255,255,
 	255,255,255,255, 255,255,255,255, 255,255,255,255, 255,255,255,255,
 	36, 255,255,255,  37, 38,255,255, 255,255, 39, 40, 255, 41, 42, 43,
-         0,   1,  2,  3,   4,  5,  6,  7,   8,  9, 44,255, 255,255,255,255, 
+	 0,   1,  2,  3,   4,  5,  6,  7,   8,  9, 44,255, 255,255,255,255,
 
-        255, 10, 11, 12,  13, 14, 15, 16,  17, 18, 19, 20,  21, 22, 23, 24, /* uppercase */
-         25, 26, 27, 28,  29, 30, 31, 32,  33, 34, 35, 35, 255,255,255,255,
-        255, 10, 11, 12,  13, 14, 15, 16,  17, 18, 19, 20,  21, 22, 23, 24, /* lowercase */
-         25, 26, 27, 28,  29, 30, 31, 32,  33, 34, 35, 35, 255,255,255,255,
+	255, 10, 11, 12,  13, 14, 15, 16,  17, 18, 19, 20,  21, 22, 23, 24, /* uppercase */
+	 25, 26, 27, 28,  29, 30, 31, 32,  33, 34, 35, 35, 255,255,255,255,
+	255, 10, 11, 12,  13, 14, 15, 16,  17, 18, 19, 20,  21, 22, 23, 24, /* lowercase */
+	 25, 26, 27, 28,  29, 30, 31, 32,  33, 34, 35, 35, 255,255,255,255,
 
-	255,255,255,255, 255,255,255,255, 255,255,255,255, 255,255,255,255, 
+	255,255,255,255, 255,255,255,255, 255,255,255,255, 255,255,255,255,
 	255,255,255,255, 255,255,255,255, 255,255,255,255, 255,255,255,255,
 	255,255,255,255, 255,255,255,255, 255,255,255,255, 255,255,255,255,
 	255,255,255,255, 255,255,255,255, 255,255,255,255, 255,255,255,255,
@@ -57,35 +57,42 @@ int base45_encode(char * dst, size_t *_max_dst_len, const unsigned char * src, s
         unsigned char d = x / 45;
         unsigned char c = x % 45;
 
-	if (out_len < max_dst_len && dst)
+	if (out_len < max_dst_len && dst) {
 		dst[ out_len ] = BASE45_CHARSET[c];
+	}
 	out_len++;
-	if (out_len < max_dst_len && dst)
+	if (out_len < max_dst_len && dst) {
 		dst[ out_len ] = BASE45_CHARSET[d];
+	}
 	out_len++;
-	if (out_len < max_dst_len && dst)
+	if (out_len < max_dst_len && dst) {
 		dst[ out_len ] = BASE45_CHARSET[e];
+	}
 	out_len++;
      } else {
         int x = src[i];
         unsigned char d = x / 45;
         unsigned char c = x % 45;
 
-	if (out_len < max_dst_len && dst)
+	if (out_len < max_dst_len && dst) {
 		dst[ out_len ] = BASE45_CHARSET[c];
+	}
 	out_len++;
 
-	if (out_len < max_dst_len && dst)
+	if (out_len < max_dst_len && dst) {
 		dst[ out_len ] = BASE45_CHARSET[d];
+	}
 	out_len++;
      }
   }
   /* Same non guarantee as strncpy et.al. */
-  if (out_len < max_dst_len && dst)
+  if (out_len < max_dst_len && dst) {
 	dst[ out_len ] = 0;
+  }
 
-  if (_max_dst_len)
+  if (_max_dst_len) {
 	*_max_dst_len = out_len;
+  }
   return 0;
 }
 
@@ -94,45 +101,54 @@ int base45_decode(unsigned char * dst, size_t * _max_dst_len, const char *src, s
   max_dst_len = _max_dst_len  ? *_max_dst_len : src_len;
   int i;
 
-  if (dst == NULL && _max_dst_len == NULL)
+  if (dst == NULL && _max_dst_len == NULL) {
 	return -2;
+  }
 
-  if (src == NULL)
+  if (src == NULL) {
 	return -2;
+  }
 
-  if (src_len == 0)
+  if (src_len == 0) {
 	src_len = strlen(src);
+  }
 
   for(i = 0; i < src_len; i+=3) {
      int x,a,b;
 
-     if (src_len - i < 2)
+     if (src_len - i < 2) {
 	return -1;
+     }
 
-     if ((255 == (a = _C2I[(unsigned char)src[i]])) || (255 == (b = _C2I[(unsigned char)src[i+1]])))
+     if ((255 == (a = _C2I[(unsigned char)src[i]])) || (255 == (b = _C2I[(unsigned char)src[i+1]]))) {
 	return -1;
+     }
 
      x = a + 45 * b;
 
      if (src_len - i >= 3) {
-        if (255 == (a = _C2I[(unsigned char)src[i+2]]))
+        if (255 == (a = _C2I[(unsigned char)src[i+2]])) {
 	    return -1;
+        }
 
         x += a * 45 * 45;
 
-        if (out_len < max_dst_len && dst)
+        if (out_len < max_dst_len && dst) {
         	dst[out_len] = x / 256;
+        }
         out_len++;
 	x %= 256;
     };
 
-    if (out_len < max_dst_len && dst)
+    if (out_len < max_dst_len && dst) {
         dst[out_len] = x;
+    }
 
     out_len++;
   };
-  if (_max_dst_len)
+  if (_max_dst_len) {
 	*_max_dst_len = out_len;
+  }
 
   return 0;
 }
@@ -148,8 +164,9 @@ int main(int argc, char ** argv) {
 	int at  = 1;
 
 	if (argc > 1 && argv[at][0] == '-') {
-		if (argv[at][1] == 'd')
+		if (argv[at][1] == 'd') {
 			decode = 1;
+		}
 		else {
 			fprintf(stderr,"Syntax: %s [-d] [infile [outfile]]\n", argv[0]);
 			exit(1);
@@ -186,18 +203,21 @@ int main(int argc, char ** argv) {
 
 		if (len) {
 			int e;
-			if (decode)
+			if (decode) {
 				e = base45_decode(outbuf, &olen, (char *) buff, len);
-			else
+			}
+			else {
 				e = base45_encode((char *)outbuf, &olen, buff, len);
+			}
 
 			if (e) {
 				fprintf(stderr,"base45 %s failed\n", decode ? "decode" : "encode");
 				exit(1);
 			};
 
-			if (olen)
+			if (olen) {
 				fwrite(outbuf, 1, olen, out);
+			}
 		};
 	}
 
@@ -207,5 +227,3 @@ int main(int argc, char ** argv) {
 	return(0);
 };
 #endif
-
-		
